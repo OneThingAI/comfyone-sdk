@@ -1,6 +1,8 @@
 # ComfyOne SDK
 
-ComfyOne SDK is a Python library that provides a convenient way to interact with the ComfyOne API for AI image generation and workflow management.
+ComfyOne SDK is a Python library that provides a convenient way to interact with the ComfyOne API for OneThingAI's comfyui workflow management.
+
+API documentation: [ComfyOne API](https://onethingai.yuque.com/org-wiki-onethingai-gexhu2/help/asf9hbbuf0qgrpg8)
 
 ## Installation
 

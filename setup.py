@@ -7,6 +7,7 @@ setup(
     install_requires=[
         "requests>=2.25.0",
         "websocket-client>=1.0.0",
+        "pydantic>=1.10.0",
     ],
     python_requires=">=3.7",
 ) 
