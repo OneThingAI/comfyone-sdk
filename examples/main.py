@@ -24,8 +24,8 @@ def signal_handler(signum, frame):
 
 def main():
     # Replace with your actual credentials
-    API_KEY = "97ad8bccd51ab247f7535d9c788ef949"
-    INSTANCE_ID = "dptoveqgg66ywpv8-n11h8g6z"
+    API_KEY = "your_api_key"
+    INSTANCE_ID = "your_instance_id"
 
     # Initialize API client
     client = ComfyOne(API_KEY, instance_id=INSTANCE_ID, debug=True)

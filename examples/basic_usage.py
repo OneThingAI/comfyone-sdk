@@ -28,7 +28,7 @@ def main():
     # 注意：请将 domain 替换为您的实际域名
     # debug=True 会打印更多的调试信息, 默认是关闭的，调试完成后请关闭
     client = ComfyOne(
-        api_key="97ad8bccd51ab247f7535d9c788ef949",
+        api_key="your_api_key",
         debug=True
     )
     
