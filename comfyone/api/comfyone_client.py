@@ -200,20 +200,5 @@ class ComfyOneClient:
             APIResponse: API响应数据
         """
         return self._request_api(f"v1/prompts/{prompt_id}", method="DELETE")
-
-    def get_prompt_history(self, limit: int = 10, offset: int = 0) -> APIResponse:
-        """
-        获取prompt请求历史记录
-        
-        参数:
-            limit (int): 每页记录数，默认10
-            offset (int): 起始位置，默认0
-            
-        返回:
-            APIResponse: 包含历史记录的响应数据
-        """
-        params = {
-            "limit": limit,
-            "offset": offset
-        }
-        return self._request_api("v1/prompts/history", params)
+    
+    # TODO: 添加prompt历史记录的API
