@@ -2,6 +2,9 @@ import sys
 import signal
 import json
 import time
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+
 from comfyone import ComfyOne
 from comfyone.api.models import (
     IOType,
