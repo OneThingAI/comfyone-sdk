@@ -26,7 +26,7 @@ pip install -e .
 
 ## Quick Start
 
-examples/main.py is a quick start example that demonstrates how to use the SDK to generate images and manage workflows.
+See [`examples/main.py`](examples/main.py) for a quick start example that demonstrates how to use the SDK to generate images and manage workflows.
 
 ## Features
 
