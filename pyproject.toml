@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "comfyone-sdk"
+version = "0.1.1"
+authors = [
+    { name = "Nining", email = "lining3@onething.net" },
+]
+description = "Python SDK for ComfyOne API"
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "requests>=2.25.0",
+    "websocket-client>=1.0.0"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[tool.setuptools]
+packages = ["comfyone"]
+
+[project.urls]
+"Homepage" = "https://github.com/yourusername/comfyone-sdk"
+"Bug Tracker" = "https://github.com/yourusername/comfyone-sdk/issues" 
