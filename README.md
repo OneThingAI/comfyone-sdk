@@ -41,10 +41,8 @@ See [`examples/main.py`](examples/main.py) for a quick start example that demons
 
 ## API Documentation
 
-### Main Classes
+See [API Reference](docs/api_reference.md) for detailed API documentation.
 
-#### ComfyOne
-The main client class that provides access to all API functionality.
 
 ## Development
 
