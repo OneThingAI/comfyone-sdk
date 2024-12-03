@@ -26,33 +26,31 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 def main():
-    # Replace with your actual credentials
-    API_KEY = "your_api_key"
-    INSTANCE_ID = "your_instance_id"
-
     # Initialize API client
-    client = ComfyOne(API_KEY, instance_id=INSTANCE_ID, debug=True)
+    # Replace with your actual credentials
+    client = ComfyOne(api_key="your_api_key", 
+                      debug=True)
 
-    # 查询可用后端
-    backends = client.api.get_available_backends()
-    print(backends)
+    # Replace with your actual instance IDs need to register to ComfyOne
+    instance_ids_to_register = set(["instance_1", "instance_2"])
+    
+    # Query available backends
+    existing_backends = client.api.get_available_backends()
+    print(existing_backends)
 
-    # 如果实例没有注册到ComfyOne，则注册
-    is_registered = False
-    for backend in backends.data:
-        if backend["name"] == INSTANCE_ID:
-            is_registered = True
-            break
-    if not is_registered:
-        register_result = client.api.register_backend(INSTANCE_ID)
+    # If the instance is not registered to ComfyOne, register it
+    existing_instance_ids = set(backend['name'] for backend in existing_backends.data)
+    need_register_instance_ids = instance_ids_to_register - existing_instance_ids
+    for instance_id in need_register_instance_ids:
+        register_result = client.api.register_backend(instance_id)
         if register_result is not None and register_result.code == 0:
-            print(f"注册实例成功: {register_result.data}")
+            print(f"Register instance success: {register_result.data}")
         else:
-            print(f"注册实例失败: {register_result.code}, {register_result.msg}")
-            exit(1)
+            print(f"Register instance failed: {register_result.code}, {register_result.msg}")
+            continue
     
     # Initialize WebSocket client
-    ws_client = OneThingAIWebSocket(API_KEY)
+    ws_client = OneThingAIWebSocket(client.api.api_key)
     
     # Store ws_client in signal_handler for cleanup
     signal_handler.ws_client = ws_client

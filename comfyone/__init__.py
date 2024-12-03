@@ -12,7 +12,6 @@ class ComfyOne:
     整合API和WebSocket功能的统一接口
     """
     def __init__(self, api_key: str, 
-                 instance_id: Optional[str] = None,   
                  domain: str = "pandora-server-cf.onethingai.com",
                  max_retries: int = 3,
                  timeout: int = 5,
@@ -40,7 +39,6 @@ class ComfyOne:
             })
             self.api = ComfyOneClient(
                 api_key, 
-                instance_id,
                 self.base_url, 
                 max_retries, 
                 timeout,

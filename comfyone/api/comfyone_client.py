@@ -14,7 +14,6 @@ class ComfyOneClient:
     def __init__(self, api_key: str, instance_id: Optional[str] = None, base_url: str = "https://pandora-server-cf.onethingai.com", 
                  max_retries: int = 3, timeout: int = 5, logger: Optional[logging.Logger] = None):
         self.api_key = api_key
-        self.instance_id = instance_id
         self.base_url = base_url.rstrip('/')  # Remove trailing slash if present
         self.max_retries = max_retries
         self.timeout = timeout
