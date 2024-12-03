@@ -31,12 +31,21 @@ class ComfyOneClient:
             retry_count = 0
             while retry_count < self.max_retries:
                 try:
-                    response = requests.request(
-                        method, 
-                        url, 
-                        headers=self.headers,
-                        json=payload if payload else None,
-                        timeout=self.timeout
+                    if method == "POST" and payload and "file" in payload:
+                        response = requests.request(
+                            method, 
+                            url, 
+                            headers=self.headers,
+                            files=payload,
+                            timeout=self.timeout
+                        )
+                    else:
+                        response = requests.request(
+                            method, 
+                            url, 
+                            headers=self.headers,
+                            json=payload if payload else None,
+                            timeout=self.timeout
                     )
                     
                     if response.status_code == 401:
@@ -105,6 +114,44 @@ class ComfyOneClient:
             APIResponse: API响应数据
         """
         return self._request_api(f"v1/backends/{instance_id}", method="DELETE")
+    
+    def set_backend_state(self, name: str, state: str) -> APIResponse:
+        """
+        设置后端服务实例的运行状态（启动/停止）
+        
+        参数:
+            name (str): 实例名称
+            state (str): 实例状态，可选值为 'up' 或 'down'
+            
+        返回:
+            APIResponse: API响应数据
+        """
+        payload = {"state": state}
+        return self._request_api(f"v1/backends/{name}", payload, "PATCH")
+
+    def get_backend(self, name: str) -> APIResponse:
+        """
+        获取指定实例的详细信息
+        
+        参数:
+            name (str): 实例名称
+            
+        返回:
+            APIResponse: 包含实例详情的响应数据
+        """
+        return self._request_api(f"v1/backends/{name}")
+
+    def create_workflow(self, payload: WorkflowPayload) -> APIResponse:
+        """
+        创建一个新的工作流。
+        
+        参数:
+            payload: 工作流配置参数
+            
+        返回:
+            APIResponse: API响应数据
+        """
+        return self._request_api("v1/workflows", payload.to_dict(), "POST")
 
     def get_workflows(self) -> APIResponse:
         """
@@ -127,18 +174,6 @@ class ComfyOneClient:
         """
         return self._request_api(f"v1/workflows/{workflow_id}")
 
-    def create_workflow(self, payload: WorkflowPayload) -> APIResponse:
-        """
-        创建一个新的工作流。
-        
-        参数:
-            payload: 工作流配置参数
-            
-        返回:
-            APIResponse: API响应数据
-        """
-        return self._request_api("v1/workflows", payload.to_dict(), "POST")
-
     def update_workflow(self, workflow_id: str, payload: WorkflowPayload) -> APIResponse:
         """
         更新指定的工作流
@@ -150,7 +185,7 @@ class ComfyOneClient:
         返回:
             APIResponse: API响应数据
         """
-        return self._request_api(f"v1/workflows/{workflow_id}", payload, "PUT")
+        return self._request_api(f"v1/workflows/{workflow_id}", payload, "PATCH")
 
     def delete_workflow(self, workflow_id: str) -> APIResponse:
         """
@@ -163,6 +198,25 @@ class ComfyOneClient:
             APIResponse: API响应数据
         """
         return self._request_api(f"v1/workflows/{workflow_id}", method="DELETE")
+
+    def upload_file(self, file_path: str) -> APIResponse:
+        """
+        上传文件到ComfyOne
+        
+        参数:
+            file_path (str): 要上传的文件路径
+            
+        返回:
+            APIResponse: API响应数据
+        """
+        try:
+            with open(file_path, "rb") as file:
+                payload = {"file": file}
+        except FileNotFoundError:
+            self.logger.error(f"File not found: {file_path}")
+            raise FileNotFoundError(f"File not found: {file_path}")
+
+        return self._request_api("v1/files", payload, "POST")
 
     def prompt(self, payload: PromptPayload) -> APIResponse:
         """
@@ -186,7 +240,7 @@ class ComfyOneClient:
         返回:
             APIResponse: 包含prompt状态的响应数据
         """
-        return self._request_api(f"v1/prompts/{prompt_id}")
+        return self._request_api(f"v1/prompts/{prompt_id}/status")
 
     def cancel_prompt(self, prompt_id: str) -> APIResponse:
         """
@@ -198,6 +252,6 @@ class ComfyOneClient:
         返回:
             APIResponse: API响应数据
         """
-        return self._request_api(f"v1/prompts/{prompt_id}", method="DELETE")
+        return self._request_api(f"v1/prompts/{prompt_id}/cancel", method="POST")
     
     # TODO: 添加prompt历史记录的API
