@@ -181,6 +181,16 @@ class WorkflowPayload(BaseModel):
     inputs: WorkflowInputPayload
     outputs: WorkflowOutputPayload
     workflow: Dict[str, Any]
+
+class PromptInput(BaseModel):
+    id: str
+    params: Dict[str, Any]  
+
+class PromptPayload(BaseModel):
+    workflow_id: str
+    inputs: List[PromptInput]
+    free_cache: bool = False
+    free_gpu: bool = True
 ```
 
 ## Examples

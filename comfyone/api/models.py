@@ -88,6 +88,7 @@ class PromptPayload(BaseModel):
     workflow_id: str = Field(..., min_length=1, description="工作流ID") 
     inputs: List[PromptInput] = Field(..., description="输入参数列表")
     free_cache: bool = False
+    free_gpu: bool = True
 
     @validator('inputs')
     def validate_inputs(cls, v):
