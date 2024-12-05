@@ -142,21 +142,21 @@ Remove a backend:
 curl -X DELETE "http://localhost:8000/v1/{app_id}/backends/{backend_id}"
 ```
 
-#### Backend Status Management
+#### Backend State Management
 
 Set backend to inactive:
 
 ```bash
-curl -X PATCH "http://localhost:8000/v1/{app_id}/backends/{backend_id}?status=down"
+curl -X PATCH "http://localhost:8000/v1/{app_id}/backends/{backend_id}?state=down"
 ```
 
 Set backend to active:
 
 ```bash
-curl -X PATCH "http://localhost:8000/v1/{app_id}/backends/{backend_id}?status=active"
+curl -X PATCH "http://localhost:8000/v1/{app_id}/backends/{backend_id}?state=active"
 ```
 
-Status values:
+State values:
 - `active`: Backend is available for processing requests
 - `down`: Backend is temporarily unavailable
 
