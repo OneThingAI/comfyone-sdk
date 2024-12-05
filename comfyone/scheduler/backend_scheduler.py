@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from .database import SessionLocal, BackendDB
 from .policies import BackendPolicy, RoundRobinPolicy, WeightedPolicy, AllActivePolicy, RandomPolicy
 from enum import Enum
+from .models import APIResponse
 
 router = APIRouter()
 
@@ -134,6 +135,57 @@ class BackendScheduler:
         db.expire_all()
         return Backend.from_orm(backend)
 
+    def update_policy_limit(self, policy_type: PolicyType, new_limit: int) -> APIResponse:
+        """Update the limit of a specific policy"""
+        try:
+            policy = POLICY_MAP.get(policy_type)
+            if not policy:
+                return APIResponse.error("Policy not found")
+                
+            policy.update_limit(new_limit)
+            return APIResponse.success(
+                data={"policy": policy_type, "new_limit": new_limit},
+                msg=f"Updated {policy_type} limit to {new_limit}"
+            )
+        except ValueError as e:
+            return APIResponse.error(str(e))
+
+    def get_supported_policies(self) -> APIResponse:
+        """Get list of supported policies with their current limits"""
+        policies_info = []
+        for policy_type, policy in POLICY_MAP.items():
+            policies_info.append({
+                "type": policy_type,
+                "limit": policy.limit,
+                "description": policy.__doc__.strip() if policy.__doc__ else ""
+            })
+        return APIResponse.success(
+            data=policies_info,
+            msg="Successfully retrieved supported policies"
+        )
+
+    def get_all_backends(self, db: Session) -> APIResponse:
+        """Get all backends regardless of app_id"""
+        try:
+            backends = db.query(BackendDB).all()
+            return APIResponse.success(
+                data=[Backend.from_orm(b) for b in backends],
+                msg="Successfully retrieved all backends"
+            )
+        except Exception as e:
+            return APIResponse.error(str(e))
+
+    def get_app_backends(self, db: Session, app_id: str) -> APIResponse:
+        """Get all backends for a specific app_id"""
+        try:
+            backends = db.query(BackendDB).filter(BackendDB.app_id == app_id).all()
+            return APIResponse.success(
+                data=[Backend.from_orm(b) for b in backends],
+                msg=f"Successfully retrieved backends for app_id: {app_id}"
+            )
+        except Exception as e:
+            return APIResponse.error(str(e))
+
 scheduler = BackendScheduler()
 
 @router.post("/v1/{app_id}/backends")
@@ -217,3 +269,39 @@ async def update_backend_weight(
         raise e
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.patch("/v1/policies/{policy_type}/limit")
+async def update_policy_limit(
+    policy_type: PolicyType,
+    new_limit: int
+) -> APIResponse:
+    """
+    Update the limit of a backend selection policy
+    """
+    return scheduler.update_policy_limit(policy_type, new_limit)
+
+@router.get("/v1/policies")
+async def list_policies() -> APIResponse:
+    """
+    List all supported backend selection policies
+    """
+    return scheduler.get_supported_policies()
+
+@router.get("/v1/backends")
+async def list_all_backends(
+    db: Session = Depends(get_db)
+) -> APIResponse:
+    """
+    List all backends in the system
+    """
+    return scheduler.get_all_backends(db)
+
+@router.get("/v1/{app_id}/backends/all")
+async def list_app_backends(
+    app_id: str,
+    db: Session = Depends(get_db)
+) -> APIResponse:
+    """
+    List all backends for a specific app_id without policy filtering
+    """
+    return scheduler.get_app_backends(db, app_id)
