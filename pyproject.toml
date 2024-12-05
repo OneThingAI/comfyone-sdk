@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "comfyone-sdk"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
     { name = "Nining", email = "lining3@onething.net" },
 ]
@@ -13,7 +13,11 @@ readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
     "requests>=2.25.0",
-    "websocket-client>=1.0.0"
+    "websocket-client>=1.0.0",
+    "pydantic>=1.10.0",
+    "pylint>=2.17.0",
+    "sqlalchemy>=2.0.0",
+    "fastapi>=0.100.0",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -25,5 +29,5 @@ classifiers = [
 packages = ["comfyone"]
 
 [project.urls]
-"Homepage" = "https://github.com/yourusername/comfyone-sdk"
-"Bug Tracker" = "https://github.com/yourusername/comfyone-sdk/issues" 
+"Homepage" = "https://github.com/OneThing-AI/comfyone-sdk"
+"Bug Tracker" = "https://github.com/OneThing-AI/comfyone-sdk/issues" 

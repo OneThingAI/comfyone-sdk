@@ -1,7 +1,11 @@
 import sys
 import signal
+from pathlib import Path
 import json
 from dataclasses import asdict
+
+sys.path.append(str(Path(__file__).parent.parent))
+
 from comfyone import ComfyOne
 from comfyone.api.models import (
     IOType,
