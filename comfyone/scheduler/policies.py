@@ -5,8 +5,8 @@ from .database import BackendDB
 
 class BackendPolicy(ABC):
     """Abstract base class for backend selection policies"""
-    
-    def __init__(self, limit: Optional[int] = None):
+    # Default limit to 1 to avoid empty selection
+    def __init__(self, limit: Optional[int] = 1):
         self.limit = limit
     
     @abstractmethod
@@ -19,6 +19,19 @@ class BackendPolicy(ABC):
         if self.limit is not None and len(backends) > self.limit:
             return backends[:self.limit]
         return backends
+        
+    def update_limit(self, new_limit: int) -> None:
+        """Update the policy's limit
+        
+        Args:
+            new_limit (int): New limit value, must be greater than 0
+            
+        Raises:
+            ValueError: If new_limit is less than 1
+        """
+        if new_limit < 1:
+            raise ValueError("Limit must be greater than 0")
+        self.limit = new_limit
 
 class RoundRobinPolicy(BackendPolicy):
     """Round-robin backend selection policy"""
@@ -34,9 +47,17 @@ class RoundRobinPolicy(BackendPolicy):
         if not active_backends:
             return []
             
-        selected = active_backends[self._current_index % len(active_backends)]
-        self._current_index += 1
-        return self._apply_limit([selected])
+        # Calculate and apply the limit
+        self.limit = min(self.limit or 1, len(active_backends))
+
+        # Get view from current index to end + wrap around
+        backends_view = active_backends[self._current_index:] + active_backends[:self._current_index]
+
+        # Update current index for next call
+        self._current_index = (self._current_index + self.limit) % len(active_backends)
+        
+        # Apply limit to the current index
+        return self._apply_limit(backends_view)
 
 class WeightedPolicy(BackendPolicy):
     """Weight-based backend selection policy"""
