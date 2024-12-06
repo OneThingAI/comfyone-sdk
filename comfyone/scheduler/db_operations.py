@@ -19,7 +19,7 @@ class DBOperations:
                 name=backend.name,
                 host=backend.host,
                 weight=backend.weight,
-                status=backend.status
+                state=backend.state
             )
             db.add(db_backend)
             db.commit()
@@ -38,6 +38,7 @@ class DBOperations:
         """Get all backends from database"""
         try:
             backends = db.query(BackendDB).all()
+            print(backends)
             return APIResponse.success(
                 data=[Backend.from_orm(b) for b in backends],
                 msg="Successfully retrieved all backends"
@@ -90,7 +91,7 @@ class DBOperations:
             if not backend:
                 return APIResponse.error("Backend not found")
             
-            backend.status = state
+            backend.state = state
             db.commit()
             db.refresh(backend)
             db.expire_all()

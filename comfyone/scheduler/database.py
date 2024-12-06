@@ -19,7 +19,7 @@ class BackendDB(Base):
     name = Column(String)
     host = Column(String, unique=True)
     weight = Column(Integer, default=1)
-    status = Column(String, default="active")
+    state = Column(String, default="active")
 
 # Create tables
 Base.metadata.create_all(bind=engine) 
