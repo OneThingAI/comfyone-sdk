@@ -5,9 +5,14 @@ from sqlalchemy.orm import Session
 from pydantic import ValidationError
 from .database import SessionLocal
 from .backend_scheduler import BackendScheduler
+from .models import Backend, Policy, APIResponse
+from ..utils.logging import setup_logger
 
 router = APIRouter()
-logger = logging.getLogger("scheduler")
+logger = setup_logger(name="scheduler", level=logging.INFO)
+
+def setup_log_level(level: int):
+    logger.setLevel(level)
 
 # Dependency to get DB session
 def get_db():

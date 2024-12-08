@@ -1,9 +1,10 @@
 import logging
 from typing import List, Dict, Tuple
 from sqlalchemy.orm import Session
-from .models import Backend, PolicyType, Policy, POLICY_MAPPER
+from .models import Backend, PolicyType, Policy
 from .db_operations import DBOperations
-from .policies import BackendPolicy, RoundRobinPolicy, WeightedPolicy, AllActivePolicy, RandomPolicy:w
+from .policies import BackendPolicy, RoundRobinPolicy, WeightedPolicy, AllActivePolicy, RandomPolicy
+from .policies import POLICY_MAPPER
 
 
 logger = logging.getLogger("scheduler")

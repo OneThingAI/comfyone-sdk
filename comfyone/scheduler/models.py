@@ -2,7 +2,6 @@ from typing import Optional, TypeVar, Generic, Literal, Dict
 from pydantic import BaseModel, validator
 import uuid
 from enum import Enum
-from .policies import RoundRobinPolicy, WeightedPolicy, AllActivePolicy, RandomPolicy
 
 T = TypeVar('T')
 
@@ -63,9 +62,4 @@ class Policy(BaseModel):
         "from_attributes": True
     }
 
-POLICY_MAPPER = {
-    PolicyType.ROUND_ROBIN: RoundRobinPolicy(limit=1),
-    PolicyType.WEIGHTED: WeightedPolicy(limit=1),
-    PolicyType.ALL_ACTIVE: AllActivePolicy(limit=3),
-    PolicyType.RANDOM: RandomPolicy(limit=1)
-}
+

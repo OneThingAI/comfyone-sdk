@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 import random
-from .models import Backend
+from .models import Backend, PolicyType
 
 class BackendPolicy(ABC):
     """Abstract base class for backend selection policies"""
@@ -84,3 +84,10 @@ class RandomPolicy(BackendPolicy):
         shuffled = list(active_backends)
         random.shuffle(shuffled)
         return self._apply_limit(shuffled) 
+
+POLICY_MAPPER = {
+    PolicyType.ROUND_ROBIN: RoundRobinPolicy(limit=1),
+    PolicyType.WEIGHTED: WeightedPolicy(limit=1),
+    PolicyType.ALL_ACTIVE: AllActivePolicy(limit=3),
+    PolicyType.RANDOM: RandomPolicy(limit=1)
+}
