@@ -2,7 +2,7 @@ from typing import Optional, TypeVar, Generic, Literal, Dict
 from pydantic import BaseModel, validator
 import uuid
 from enum import Enum
-from .policies import RoundRobinPolicy, WeightedPolicy, AllActivePolicy, RandomPolicy, BackendPolicy
+from .policies import RoundRobinPolicy, WeightedPolicy, AllActivePolicy, RandomPolicy
 
 T = TypeVar('T')
 
@@ -32,8 +32,8 @@ class APIResponse(BaseModel, Generic[T]):
 
 class Backend(BaseModel):
     id: str = str(uuid.uuid4())
-    name: str
-    host: str
+    app_id: str
+    instance_id: str
     weight: Optional[int] = 1
     state: str = "active"
 
@@ -43,8 +43,10 @@ class Backend(BaseModel):
             raise ValueError("State must be either 'active' or 'down'")
         return v
 
-    class Config:
-        from_attributes = True 
+    model_config = {
+        "from_attributes": True
+    }
+
 
 class PolicyType(str, Enum):
     ROUND_ROBIN = "round_robin"
@@ -52,9 +54,18 @@ class PolicyType(str, Enum):
     ALL_ACTIVE = "all_active"
     RANDOM = "random"
 
-POLICY_MAP: Dict[PolicyType, BackendPolicy] = {
+
+class Policy(BaseModel):
+    policy_type: PolicyType
+    limit: int = 1
+
+    model_config = {
+        "from_attributes": True
+    }
+
+POLICY_MAPPER = {
     PolicyType.ROUND_ROBIN: RoundRobinPolicy(limit=1),
-    PolicyType.WEIGHTED: WeightedPolicy(limit=3),
-    PolicyType.ALL_ACTIVE: AllActivePolicy(limit=5),
+    PolicyType.WEIGHTED: WeightedPolicy(limit=1),
+    PolicyType.ALL_ACTIVE: AllActivePolicy(limit=3),
     PolicyType.RANDOM: RandomPolicy(limit=1)
 }

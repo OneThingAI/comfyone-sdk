@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 import random
-from .database import BackendDB
+from .models import Backend
 
 class BackendPolicy(ABC):
     """Abstract base class for backend selection policies"""
@@ -9,29 +9,20 @@ class BackendPolicy(ABC):
     def __init__(self, limit: Optional[int] = 1):
         self.limit = limit
     
+    def update_limit(self, new_limit: int) -> None:
+        self.limit = new_limit
+    
     @abstractmethod
-    def select_backends(self, backends: List[BackendDB]) -> List[BackendDB]:
+    def select_backends(self, backends: List[Backend]) -> List[Backend]:
         """Select backends according to the policy"""
         pass
     
-    def _apply_limit(self, backends: List[BackendDB]) -> List[BackendDB]:
+    def _apply_limit(self, backends: List[Backend]) -> List[Backend]:
         """Apply limit to selected backends"""
         if self.limit is not None and len(backends) > self.limit:
             return backends[:self.limit]
         return backends
         
-    def update_limit(self, new_limit: int) -> None:
-        """Update the policy's limit
-        
-        Args:
-            new_limit (int): New limit value, must be greater than 0
-            
-        Raises:
-            ValueError: If new_limit is less than 1
-        """
-        if new_limit < 1:
-            raise ValueError("Limit must be greater than 0")
-        self.limit = new_limit
 
 class RoundRobinPolicy(BackendPolicy):
     """Round-robin backend selection policy"""
@@ -39,11 +30,11 @@ class RoundRobinPolicy(BackendPolicy):
         super().__init__(limit)
         self._current_index = 0
     
-    def select_backends(self, backends: List[BackendDB]) -> List[BackendDB]:
+    def select_backends(self, backends: List[Backend]) -> List[Backend]:
         if not backends:
             return []
         
-        active_backends = [b for b in backends if b.status == "active"]
+        active_backends = [b for b in backends if b.state == "active"]
         if not active_backends:
             return []
             
@@ -64,8 +55,8 @@ class WeightedPolicy(BackendPolicy):
     def __init__(self, limit: Optional[int] = 3):
         super().__init__(limit)
     
-    def select_backends(self, backends: List[BackendDB]) -> List[BackendDB]:
-        active_backends = [b for b in backends if b.status == "active"]
+    def select_backends(self, backends: List[Backend]) -> List[Backend]:
+        active_backends = [b for b in backends if b.state == "active"]
         if not active_backends:
             return []
             
@@ -75,8 +66,8 @@ class WeightedPolicy(BackendPolicy):
 
 class AllActivePolicy(BackendPolicy):
     """Return all active backends"""
-    def select_backends(self, backends: List[BackendDB]) -> List[BackendDB]:
-        active_backends = [b for b in backends if b.status == "active"]
+    def select_backends(self, backends: List[Backend]) -> List[Backend]:
+        active_backends = [b for b in backends if b.state == "active"]
         return self._apply_limit(active_backends)
 
 class RandomPolicy(BackendPolicy):
@@ -84,8 +75,8 @@ class RandomPolicy(BackendPolicy):
     def __init__(self, limit: Optional[int] = 1):
         super().__init__(limit)
     
-    def select_backends(self, backends: List[BackendDB]) -> List[BackendDB]:
-        active_backends = [b for b in backends if b.status == "active"]
+    def select_backends(self, backends: List[Backend]) -> List[Backend]:
+        active_backends = [b for b in backends if b.state == "active"]
         if not active_backends:
             return []
             
