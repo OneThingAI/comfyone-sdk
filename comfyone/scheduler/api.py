@@ -140,6 +140,17 @@ async def list_policies() -> APIResponse:
     """List all supported policies"""
     return APIResponse.success(data=scheduler.get_all_policies())
 
+@router.get("/v1/{app_id}/policy")
+async def get_policy(
+    app_id: str,
+    db: Session = Depends(get_db)
+) -> APIResponse:
+    """Get the policy of an app"""
+    try:
+        return APIResponse.success(data=scheduler.get_policy(db, app_id))
+    except Exception as e:
+        return APIResponse.error(str(e))
+
 @router.patch("/v1/{app_id}/policy")
 async def update_policy(
     app_id: str,
