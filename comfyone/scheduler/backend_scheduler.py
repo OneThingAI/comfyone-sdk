@@ -94,7 +94,7 @@ class BackendScheduler:
         """Update the limit of a specific policy"""
         return self.db_ops.update_policy_limit(db, app_id, policy)
 
-    def get_all_policies(self, db: Session) -> List[str]:
+    def get_all_policies(self) -> List[str]:
         """Get all supported policies"""
         policies = []
         for policy_type in PolicyType:
