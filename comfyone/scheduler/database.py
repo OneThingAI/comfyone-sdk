@@ -14,12 +14,19 @@ Base = declarative_base()
 class BackendDB(Base):
     __tablename__ = "backends"
 
-    id = Column(String, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     app_id = Column(String, index=True)
-    name = Column(String)
-    host = Column(String, unique=True)
+    instance_id = Column(String, unique=True)
     weight = Column(Integer, default=1)
-    status = Column(String, default="active")
+    state = Column(String, default="active")
+
+
+class PolicyDB(Base):
+    __tablename__ = "policies"
+    
+    app_id = Column(String, primary_key=True, index=True)
+    policy_type = Column(String, default="round_robin")
+    limit = Column(Integer, default=1)
 
 # Create tables
 Base.metadata.create_all(bind=engine) 

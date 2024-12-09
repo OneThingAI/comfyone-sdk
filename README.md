@@ -56,6 +56,16 @@ For detailed information about the scheduler, including:
 - Configuration options
 - Usage examples
 
+Start a example backend scheduler:
+
+```bash
+cd comfyone/examples
+python backend_scheduler.py
+```
+or start it by python module:
+```bash
+python -m comfyone.examples.backend_scheduler
+
 See [Scheduler Documentation](docs/scheduler.md)
 
 ## Development
