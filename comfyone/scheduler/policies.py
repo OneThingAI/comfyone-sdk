@@ -16,6 +16,11 @@ class BackendPolicy(ABC):
     def select_backends(self, backends: List[Backend]) -> List[Backend]:
         """Select backends according to the policy"""
         pass
+
+    @abstractmethod
+    def short_name(self) -> str:
+        """Short name of the policy"""
+        pass
     
     def _apply_limit(self, backends: List[Backend]) -> List[Backend]:
         """Apply limit to selected backends"""
@@ -50,6 +55,9 @@ class RoundRobinPolicy(BackendPolicy):
         # Apply limit to the current index
         return self._apply_limit(backends_view)
 
+    def short_name(self) -> str:
+        return "round_robin"
+
 class WeightedPolicy(BackendPolicy):
     """Weight-based backend selection policy"""
     def __init__(self, limit: Optional[int] = 3):
@@ -64,11 +72,18 @@ class WeightedPolicy(BackendPolicy):
         sorted_backends = sorted(active_backends, key=lambda x: x.weight, reverse=True)
         return self._apply_limit(sorted_backends)
 
+    def short_name(self) -> str:
+        return "weighted"
+
 class AllActivePolicy(BackendPolicy):
     """Return all active backends"""
     def select_backends(self, backends: List[Backend]) -> List[Backend]:
         active_backends = [b for b in backends if b.state == "active"]
         return self._apply_limit(active_backends)
+
+    def short_name(self) -> str:
+        return "all_active"
+
 
 class RandomPolicy(BackendPolicy):
     """Random backend selection policy"""
@@ -84,6 +99,9 @@ class RandomPolicy(BackendPolicy):
         shuffled = list(active_backends)
         random.shuffle(shuffled)
         return self._apply_limit(shuffled) 
+
+    def short_name(self) -> str:
+        return "random"
 
 def create_policy(policy_type: PolicyType, limit: Optional[int] = None) -> BackendPolicy:
     """
@@ -108,10 +126,3 @@ def create_policy(policy_type: PolicyType, limit: Optional[int] = None) -> Backe
         raise ValueError(f"Unknown policy type: {policy_type}")
         
     return policy_class(limit=limit)
-
-POLICY_MAPPER = {
-    PolicyType.ROUND_ROBIN: RoundRobinPolicy(limit=1),
-    PolicyType.WEIGHTED: WeightedPolicy(limit=1),
-    PolicyType.ALL_ACTIVE: AllActivePolicy(limit=3),
-    PolicyType.RANDOM: RandomPolicy(limit=1)
-}

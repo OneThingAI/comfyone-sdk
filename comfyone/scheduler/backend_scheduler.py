@@ -13,6 +13,7 @@ class BackendScheduler:
     def __init__(self):
         self.default_policy = Policy(policy_type=PolicyType.ROUND_ROBIN, limit=1)
         self.db_ops = DBOperations()
+        self.policy_mapper = {}
         logger.debug(f"Initialized BackendScheduler with default policy: {self.default_policy.policy_type}")
     
     def add_backend(self, db: Session, backend: Backend) -> Tuple[Backend, Policy]:
@@ -46,11 +47,23 @@ class BackendScheduler:
             except ValueError as e:
                 logger.error(f"Failed to get policy: {str(e)}, using default policy")
                 policy = self.default_policy
-            
+
+            logger.debug(f"policy operation")
+            logger.debug(f"Policy: {policy.policy_type}, limit: {policy.limit}")
+            if app_id not in self.policy_mapper:
+                self.policy_mapper[app_id] = create_policy(policy.policy_type, limit=policy.limit)
+            elif policy.policy_type.value != self.policy_mapper[app_id].short_name().lower():
+                self.policy_mapper[app_id] = create_policy(policy.policy_type, limit=policy.limit)
+            elif policy.limit != self.policy_mapper[app_id].limit:
+                self.policy_mapper[app_id].update_limit(policy.limit)
+            else:
+                logger.debug(f"Policy exists for app_id={app_id},"
+                             f" policy_type={policy.policy_type},"
+                             f" limit={policy.limit}")
+            selected_policy = self.policy_mapper[app_id]
+            logger.debug(f"Policy: {policy.policy_type}, limit: {policy.limit}")    
             backends = self.db_ops.get_app_backends(db, app_id)
             logger.debug(f"Backends: {[b.instance_id for b in backends]}")
-            logger.debug(f"Policy: {policy.policy_type}, limit: {policy.limit}")    
-            selected_policy = create_policy(policy.policy_type, limit=policy.limit)
             selected_backends = selected_policy.select_backends(backends)
             logger.debug(f"Selected backends: {[b.instance_id for b in selected_backends]}")
             return selected_backends
