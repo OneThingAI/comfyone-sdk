@@ -34,6 +34,8 @@ client = ComfyOne(
 ### ComfyOne
 
 Main client class that provides access to all API functionality.
+ComfyOne service implements a round-robin policy to select backend uniformly.
+if you want to use a specific backend, you can set the backend parameter in the PromptPayload.
 
 #### Parameters
 - `api_key` (str): Your OneThingAI API key
@@ -191,6 +193,7 @@ class PromptPayload(BaseModel):
     inputs: List[PromptInput]
     free_cache: bool = False
     free_gpu: bool = True
+    backend: Optional[str] = None
 ```
 
 ## Examples

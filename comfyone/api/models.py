@@ -89,6 +89,7 @@ class PromptPayload(BaseModel):
     inputs: List[PromptInput] = Field(..., description="输入参数列表")
     free_cache: bool = False
     free_gpu: bool = True
+    backend: Optional[str] = None
 
     @validator('inputs')
     def validate_inputs(cls, v):
