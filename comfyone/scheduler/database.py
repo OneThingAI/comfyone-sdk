@@ -14,7 +14,7 @@ Base = declarative_base()
 class BackendDB(Base):
     __tablename__ = "backends"
 
-    id = Column(String, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     app_id = Column(String, index=True)
     instance_id = Column(String, unique=True)
     weight = Column(Integer, default=1)

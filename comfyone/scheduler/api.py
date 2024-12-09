@@ -157,9 +157,9 @@ async def update_policy(
     policy: Policy,
     db: Session = Depends(get_db)
 ) -> APIResponse:
-    """Update the limit of a backend selection policy"""
+    """Update the policy of a backend selection policy"""
     try:    
         scheduler.update_policy(db, app_id, policy)
-        return APIResponse.success(msg=f"{app_id}'s policy updated to {policy.policy_type}")
+        return APIResponse.success(msg=f"{app_id}'s policy now is {policy.policy_type}, limit: {policy.limit}")
     except Exception as e:
         return APIResponse.error(str(e))

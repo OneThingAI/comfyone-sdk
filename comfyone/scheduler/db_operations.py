@@ -13,7 +13,6 @@ class DBOperations:
             raise ValueError(f"Backend with {backend.instance_id} already exists")
         
         db_backend = BackendDB(
-            id=backend.id,
             app_id=backend.app_id,
             instance_id=backend.instance_id,
             weight=backend.weight,
@@ -43,7 +42,7 @@ class DBOperations:
         """Remove a backend from database"""
         backend = db.query(BackendDB).filter(
             BackendDB.app_id == app_id,
-            BackendDB.id == backend_id
+            BackendDB.instance_id == backend_id
         ).first()
         if not backend:
             raise ValueError("Backend not found")
@@ -51,6 +50,7 @@ class DBOperations:
         db.delete(backend)
         db.commit()
         db.expire_all()
+        
         return Backend.from_orm(backend)
 
     @staticmethod
@@ -82,7 +82,7 @@ class DBOperations:
         
         backend = db.query(BackendDB).filter(
             BackendDB.app_id == current_app_id,
-            BackendDB.id == backend_id
+            BackendDB.instance_id == backend_id
         ).first()
         
         if not backend:
@@ -103,7 +103,7 @@ class DBOperations:
             
         backend = db.query(BackendDB).filter(
             BackendDB.app_id == app_id,
-            BackendDB.id == backend_id
+            BackendDB.instance_id == backend_id
         ).first()
         
         if not backend:

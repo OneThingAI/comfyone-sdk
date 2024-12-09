@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from .models import Backend, PolicyType, Policy
 from .db_operations import DBOperations
 from .policies import BackendPolicy, RoundRobinPolicy, WeightedPolicy, AllActivePolicy, RandomPolicy
-from .policies import POLICY_MAPPER
+from .policies import create_policy
 
 
 logger = logging.getLogger("scheduler")
@@ -48,7 +48,9 @@ class BackendScheduler:
                 policy = self.default_policy
             
             backends = self.db_ops.get_app_backends(db, app_id)
-            selected_policy = POLICY_MAPPER[policy.policy_type].update_limit(policy.limit)
+            logger.debug(f"Backends: {[b.instance_id for b in backends]}")
+            logger.debug(f"Policy: {policy.policy_type}, limit: {policy.limit}")    
+            selected_policy = create_policy(policy.policy_type, limit=policy.limit)
             selected_backends = selected_policy.select_backends(backends)
             logger.debug(f"Selected backends: {[b.instance_id for b in selected_backends]}")
             return selected_backends
@@ -67,6 +69,9 @@ class BackendScheduler:
 
     def update_backend_weight(self, db: Session, app_id: str, backend_id: str, weight: int) -> Backend:
         return self.db_ops.update_backend_weight(db, app_id, backend_id, weight)
+
+    def get_policy(self, db: Session, app_id: str) -> Policy:
+        return self.db_ops.get_policy(db, app_id)
 
     def update_policy(self, db: Session, app_id: str, policy: Policy) -> Policy:
         """Update policy type in database"""

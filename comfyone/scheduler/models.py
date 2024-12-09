@@ -1,6 +1,5 @@
 from typing import Optional, TypeVar, Generic, Literal, Dict
 from pydantic import BaseModel, validator
-import uuid
 from enum import Enum
 
 T = TypeVar('T')
@@ -30,7 +29,6 @@ class APIResponse(BaseModel, Generic[T]):
         )
 
 class Backend(BaseModel):
-    id: str = str(uuid.uuid4())
     app_id: str
     instance_id: str
     weight: Optional[int] = 1

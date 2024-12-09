@@ -85,6 +85,30 @@ class RandomPolicy(BackendPolicy):
         random.shuffle(shuffled)
         return self._apply_limit(shuffled) 
 
+def create_policy(policy_type: PolicyType, limit: Optional[int] = None) -> BackendPolicy:
+    """
+    Factory function to create a policy instance based on type and limit
+    
+    Args:
+        policy_type: Type of policy to create
+        limit: Optional limit for the policy (uses default if None)
+    
+    Returns:
+        BackendPolicy: Instance of the requested policy
+    """
+    policy_classes = {
+        PolicyType.ROUND_ROBIN: RoundRobinPolicy,
+        PolicyType.WEIGHTED: WeightedPolicy,
+        PolicyType.ALL_ACTIVE: AllActivePolicy,
+        PolicyType.RANDOM: RandomPolicy
+    }
+    
+    policy_class = policy_classes.get(policy_type)
+    if not policy_class:
+        raise ValueError(f"Unknown policy type: {policy_type}")
+        
+    return policy_class(limit=limit)
+
 POLICY_MAPPER = {
     PolicyType.ROUND_ROBIN: RoundRobinPolicy(limit=1),
     PolicyType.WEIGHTED: WeightedPolicy(limit=1),
