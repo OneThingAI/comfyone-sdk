@@ -56,6 +56,9 @@ For detailed information about the scheduler, including:
 - Configuration options
 - Usage examples
 
+Quick Start:
+python -m comfyone.scheduler.launch_server
+
 Start a example backend scheduler:
 
 ```bash
