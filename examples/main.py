@@ -28,7 +28,7 @@ def signal_handler(signum, frame):
 def main():
     # Initialize API client
     # Replace with your actual credentials
-    client = ComfyOne(api_key="your_api_key", 
+    client = ComfyOne("your_api_key", 
                       debug=True)
 
     # Replace with your actual instance IDs need to register to ComfyOne
@@ -92,7 +92,7 @@ def main():
 
     def handle_finished(data):
         if data['data']['success']:
-            print(f"任务 {data['taskId']} 已完成")
+            print(f"任务 {data['taskId']} 已完成, 输出内容: {client.api.get_prompt_status(data['taskId'])}")
             # Here you can add code to fetch the output content through the API
             
     def handle_error(data):
@@ -127,6 +127,7 @@ def main():
             
             prompt_result = client.api.prompt(prompt_payload)
             if prompt_result.code == 0:    
+                print(f"prompt_result: {prompt_result}")
                 print(prompt_result.data)
             else:
                 print(f"生成图片失败: {prompt_result.code}, {prompt_result.msg}")

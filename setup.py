@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="comfyone-sdk",
-    version="0.1.3",
+    version="0.1.4",
     packages=["comfyone"],
     install_requires=[
         "requests>=2.25.0",
