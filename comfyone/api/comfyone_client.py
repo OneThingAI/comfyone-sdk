@@ -19,7 +19,6 @@ class ComfyOneClient:
         self.timeout = timeout
         self.logger = logger or logging.getLogger(__name__)
         self.headers = {
-            "Content-Type": "application/json",
             "Authorization": f"Bearer {api_key}"
         }
 
@@ -210,13 +209,17 @@ class ComfyOneClient:
             APIResponse: API响应数据
         """
         try:
-            with open(file_path, "rb") as file:
-                payload = {"file": file}
+            payload = {"file": open(file_path, "rb")}
         except FileNotFoundError:
             self.logger.error(f"File not found: {file_path}")
             raise FileNotFoundError(f"File not found: {file_path}")
-
-        return self._request_api("v1/files", payload, "POST")
+        except Exception as e:
+            self.logger.error(f"Error uploading file: {e}")
+            raise e
+        ret = self._request_api("v1/files", payload, "POST")
+        # 关闭文件
+        payload["file"].close()
+        return ret
 
     def prompt(self, payload: PromptPayload) -> APIResponse:
         """
