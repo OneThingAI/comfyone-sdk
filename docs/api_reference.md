@@ -113,6 +113,19 @@ The API client class that handles all HTTP requests to the ComfyOne API.
      - `file_path` (str): Path to the file
    - Returns: `APIResponse`
 
+3. **download_file(url: str, save_path: str = None)**
+   - Downloads a file from ComfyOne
+   - Parameters:
+     - `url` (str): File download URL
+     - `save_path` (str, optional): File save path. Can be:
+       - None: Save to current directory, use filename from URL
+       - Directory path: Save to specified directory, use filename from URL
+       - Full file path: Save to specified location with specified filename
+   - Returns: `str`: Full path of saved file
+   - Raises:
+     - `ConnectionError`: If download fails
+     - `IOError`: If saving file to local fails
+
 ### WebSocket Support
 
 The SDK includes WebSocket support for real-time task monitoring:

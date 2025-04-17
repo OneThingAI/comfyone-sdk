@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 import time
 import logging
 from typing import Optional, List
@@ -256,5 +257,50 @@ class ComfyOneClient:
             APIResponse: API响应数据
         """
         return self._request_api(f"v1/prompts/{prompt_id}/cancel", method="POST")
+    
+    def download_file(self, url: str, save_path: str = None) -> str:
+        """
+        从ComfyOne服务器下载文件
+        
+        参数:
+            url (str): 文件下载URL
+            save_path (str, optional): 文件保存路径。如果为None，将保存在当前目录下，使用URL中的文件名
+            
+        返回:
+            str: 保存文件的完整路径
+        """
+        try:
+            response = requests.get(url, headers=self.headers, stream=True)
+            response.raise_for_status()
+            
+            # If save_path is not provided, extract filename from URL or use default name
+            if save_path is None:
+                from urllib.parse import urlparse
+                from os.path import basename, splitext
+                parsed_url = urlparse(url)
+                url_filename = basename(parsed_url.path)
+                
+                # If URL doesn't have a filename or extension, use a default
+                if not url_filename or not splitext(url_filename)[1]:
+                    save_path = f"comfyone_download_{int(time.time())}.png"
+                else:
+                    save_path = url_filename
+            else:
+                save_path = os.path.join(save_path, url_filename)
+            
+            with open(save_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+            
+            self.logger.debug(f"File downloaded successfully to: {save_path}")
+            return save_path
+            
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Error downloading file: {str(e)}")
+            raise ConnectionError(f"Failed to download file: {str(e)}")
+        except IOError as e:
+            self.logger.error(f"Error saving file: {str(e)}")
+            raise IOError(f"Failed to save file: {str(e)}")
     
     # TODO: 添加prompt历史记录的API

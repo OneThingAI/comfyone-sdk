@@ -92,9 +92,19 @@ def main():
 
     def handle_finished(data):
         if data['data']['success']:
-            print(f"任务 {data['taskId']} 已完成, 输出内容: {client.api.get_prompt_status(data['taskId'])}")
-            # Here you can add code to fetch the output content through the API
+            status_response = client.api.get_prompt_status(data['taskId'])
+            print(data, status_response)
+            print(f"任务 {data['taskId']} 已完成")
             
+            if 'images' in status_response.data:
+                try:
+                    # Download to current directory with automatic naming
+                    for url in status_response.data["images"]:
+                        saved_path = client.api.download_file(url)
+                        print(f"结果已下载到: {saved_path}")
+                except Exception as e:
+                    print(f"下载文件失败: {str(e)}")
+
     def handle_error(data):
         print(f"任务执行出错: {data['data']['message']}")
 
